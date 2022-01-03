@@ -10,19 +10,11 @@ import java.util.List;
 public interface TicketRepository {
     List<Ticket> getAll();
 
-    Ticket findTicketById(Long id);
+    Ticket getId(Long id);
 
-    List<Ticket> getTicketById(Long id);
+    Ticket getByName(String name);
 
-    List<Ticket> getTicketByName(String name);
+    void add(Ticket ticket);
 
-    List<Ticket> getTicketByDate(Date date);
-
-    List<Ticket> getTicketByUrgency(Urgency urgency);
-
-    List<Ticket> getTicketByState(State state);
-
-    void addTicket(Ticket ticket);
-
-    void editTicket(Ticket ticket);
+    void update(Ticket ticket);
 }

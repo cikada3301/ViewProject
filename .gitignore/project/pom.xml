@@ -90,7 +90,14 @@
             <version>1.18.20.0</version>
             <scope>provided</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>3.18.2</version>
+        </dependency>
     </dependencies>
+
 
     <build>
         <plugins>
@@ -100,6 +107,4 @@
             </plugin>
         </plugins>
     </build>
-
-
 </project>

@@ -3,135 +3,64 @@ package com.training.vpalagin.project.controller;
 import com.training.vpalagin.project.converter.TicketConverter;
 import com.training.vpalagin.project.dto.TicketDto;
 import com.training.vpalagin.project.model.Ticket;
-import com.training.vpalagin.project.model.enums.State;
-import com.training.vpalagin.project.model.enums.Urgency;
+import com.training.vpalagin.project.model.enums.Action;
 import com.training.vpalagin.project.service.TicketService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/tickets")
+@RequiredArgsConstructor
+@RequestMapping("/api")
 public class TicketController {
 
     private final TicketService ticketService;
     private final TicketConverter ticketConverter;
 
-    public TicketController(TicketService ticketService, TicketConverter ticketConverter) {
-        this.ticketService = ticketService;
-        this.ticketConverter = ticketConverter;
-    }
-
-    @GetMapping
-    public ResponseEntity<List<TicketDto>> getAllTickets() {
+    @GetMapping("/main-page")
+    public ResponseEntity<List<TicketDto>> getAll() {
         final List<TicketDto> users = ticketService.getAll();
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/ascendingid")
-    public ResponseEntity<List<Ticket>> getSortedAscendingTicketsById() {
-        final List<Ticket> users = ticketService.getSortedAscendingTicketsById();
+    @GetMapping("/sort/{param}")
+    public ResponseEntity<List<Ticket>> sort(@PathVariable("param") String param) {
+        final List<Ticket> users = ticketService.sort(param);
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/descendingid")
-    public ResponseEntity<List<Ticket>> getSortedDescendingTicketsById() {
-        final List<Ticket> users = ticketService.getSortedDescendingTicketsById();
-        return ResponseEntity.ok(users);
+    @GetMapping("/search/{param}")
+    public ResponseEntity<Optional<Ticket>> find(@PathVariable String param) {
+        final Optional<Ticket> ticket = ticketService.find(param);
+        return ResponseEntity.ok(ticket);
     }
 
-    @GetMapping("/alphabeticname")
-    public ResponseEntity<List<Ticket>> getSortedAlphabeticOrderTicketsByName() {
-        final List<Ticket> users = ticketService.getSortedAlphabeticOrderTicketsByName();
-        return ResponseEntity.ok(users);
+    @GetMapping("/ticket-info/{id}}")
+    public ResponseEntity<Optional<TicketDto>> getTicket(@PathVariable("id") Long id) {
+        final Optional<TicketDto> ticket = ticketService.getById(id);
+        return ResponseEntity.ok(ticket);
     }
 
-    @GetMapping("/invertedname")
-    public ResponseEntity<List<Ticket>> getSortedInvertedOrderTicketsByName() {
-        final List<Ticket> users = ticketService.getSortedInvertedOrderTicketsByName();
-        return ResponseEntity.ok(users);
-    }
 
-    @GetMapping("/ascendingdate")
-    public ResponseEntity<List<Ticket>> getSortedAscendingTicketsByDate() {
-        final List<Ticket> users = ticketService.getSortedAscendingTicketsByDate();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/descendingdate")
-    public ResponseEntity<List<Ticket>> getSortedDescendingTicketsByDate() {
-        final List<Ticket> users = ticketService.getSortedDescendingTicketsByDate();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/urgency")
-    public ResponseEntity<List<Ticket>> getSortedTicketsByUrgency() {
-        final List<Ticket> users = ticketService.getSortedTicketsByUrgency();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/invertedurgency")
-    public ResponseEntity<List<Ticket>> getSortedInvertedTicketsByUrgency() {
-        final List<Ticket> users = ticketService.getSortedInvertedTicketsByUrgency();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/alphabeticstatus")
-    public ResponseEntity<List<Ticket>> getSortedAlphabeticOrderTicketsByStatus() {
-        final List<Ticket> users = ticketService.getSortedAlphabeticOrderTicketsByStatus();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/invertedstatus")
-    public ResponseEntity<List<Ticket>> getSortedInvertedOrderTicketsByStatus() {
-        final List<Ticket> users = ticketService.getSortedInvertedTicketsByStatus();
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<List<Ticket>> getTicketById(@PathVariable Long id) {
-        final List<Ticket> users = ticketService.getTicketById(id);
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/name/{name}")
-    public ResponseEntity<List<Ticket>> getTicketByName(@PathVariable String name) {
-        final List<Ticket> users = ticketService.getTicketByName(name);
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/date/{date}")
-    public ResponseEntity<List<Ticket>> getTicketByDate(@PathVariable Date date) {
-        final List<Ticket> users = ticketService.getTicketByDate(date);
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/urgency/{urgency}")
-    public ResponseEntity<List<Ticket>> getTicketByUrgency(@PathVariable Urgency urgency) {
-        final List<Ticket> users = ticketService.getTicketByUrgency(urgency);
-        return ResponseEntity.ok(users);
-    }
-
-    @GetMapping("/state/{state}")
-    public ResponseEntity<List<Ticket>> getTicketByState(@PathVariable State state) {
-        final List<Ticket> users = ticketService.getTicketByState(state);
-        return ResponseEntity.ok(users);
-    }
-
-    @PostMapping("/add")
-    public ResponseEntity<List<Ticket>> createTicket(@RequestBody TicketDto ticketDto) {
-        Ticket ticket = ticketConverter.convertFromDto(ticketDto);
-        ticketService.addTicket(ticket);
+    @PostMapping("/create-ticket")
+    public ResponseEntity<Void> create(@RequestBody TicketDto ticketDto) {
+        ticketService.addTicket(ticketDto);
         return ResponseEntity.created(URI.create("tickets")).build();
     }
 
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<Ticket> updateTicket(@PathVariable("id") Long id, @RequestBody TicketDto ticketDto) {
-        Ticket ticket = ticketConverter.convertFromDto(ticketDto);
-        ticketService.editTicket(id, ticket);
-        return ResponseEntity.ok(ticket);
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable("id") Long id, @RequestBody TicketDto ticketDto) {
+        ticketService.editTicket(id, ticketDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/action")
+    public ResponseEntity<Void> transitStatus(@PathVariable("id") Long id, @RequestParam Action action) {
+        ticketService.transitStatus(id, action);
+        return ResponseEntity.ok().build();
     }
 }

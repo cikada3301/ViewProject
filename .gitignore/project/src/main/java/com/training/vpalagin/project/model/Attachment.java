@@ -1,12 +1,22 @@
 package com.training.vpalagin.project.model;
 
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
-@Entity(name = "ATTACHMENT")
-@Data
+@Entity
+@Table(name = "ATTACHMENTS")
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
 public class Attachment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false, updatable = false)
@@ -16,7 +26,7 @@ public class Attachment {
     @Column(name = "PHOTO", columnDefinition = "BLOB")
     private byte[] photo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Ticket ticket;
 
     @Column(name = "NAME")

@@ -1,12 +1,19 @@
 package com.training.vpalagin.project.service.impl;
 
+import com.training.vpalagin.project.converter.HistoryConverter;
 import com.training.vpalagin.project.converter.TicketConverter;
+import com.training.vpalagin.project.dto.HistoryDto;
 import com.training.vpalagin.project.dto.TicketDto;
+import com.training.vpalagin.project.logger.TicketLogger;
+import com.training.vpalagin.project.model.History;
 import com.training.vpalagin.project.model.Ticket;
-import com.training.vpalagin.project.model.enums.State;
-import com.training.vpalagin.project.model.enums.Urgency;
+import com.training.vpalagin.project.model.User;
+import com.training.vpalagin.project.model.enums.Action;
+import com.training.vpalagin.project.repository.HistoryRepository;
 import com.training.vpalagin.project.repository.TicketRepository;
+import com.training.vpalagin.project.repository.UserRepository;
 import com.training.vpalagin.project.service.TicketService;
+import com.training.vpalagin.project.service.transition.TicketTransitionMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +22,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,209 +35,88 @@ public class TicketServiceImpl implements TicketService {
 
     private final TicketRepository ticketRepository;
 
+    private final UserRepository userRepository;
+
     private final TicketConverter ticketConverter;
 
+    private final TicketTransitionMap ticketTransitionMap;
+
+    private final HistoryRepository historyRepository;
+
+    private final HistoryConverter historyConverter;
+
+    private final Map<String, Comparator<Ticket>> mapSort = new HashMap<>() {{
+        put("id", Comparator.comparing(Ticket::getId));
+        put("name", Comparator.comparing(Ticket::getName));
+        put("date", Comparator.comparing(Ticket::getDesiredResolutionDate));
+        put("urgency", Comparator.comparing(Ticket::getUrgency));
+        put("status", Comparator.comparing(Ticket::getState));
+    }};
+
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS
-    )
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, propagation = Propagation.SUPPORTS)
     public List<TicketDto> getAll() {
         List<Ticket> ticketList = ticketRepository.getAll();
-        log.info("service tickets: {}", ticketList);
-        List<TicketDto> tickets = ticketList
+        return ticketList
                 .stream()
                 .map(ticketConverter::convertToDto)
                 .sorted(Comparator.comparing(TicketDto::getUrgencyId)
                         .thenComparing(TicketDto::getDesiredResolutionDate))
                 .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedAscendingTicketsById() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getId))
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, propagation = Propagation.SUPPORTS)
+    public Optional<TicketDto>  getById(Long id) {
+        Ticket ticket = ticketRepository.getId(id);
+        return Optional.of(ticketConverter.convertToDto(ticket));
+    }
+
+    @Override
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<Ticket> sort(String param) {
+        return ticketRepository.getAll().stream()
+                .sorted(mapSort.get(param))
                 .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedDescendingTicketsById() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getId).reversed())
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, propagation = Propagation.SUPPORTS)
+    public Optional<Ticket> find(String param) {
+        List<Ticket> tickets = ticketRepository.getAll();
+        return tickets.stream().filter(ticket -> ticket.getId().toString().contains(param) ||
+                ticket.getName().contains(param) ||
+                ticket.getDesiredResolutionDate().toString().contains(param) ||
+                ticket.getUrgency().toString().contains(param) ||
+                ticket.getState().toString().contains(param)).findAny();
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedAlphabeticOrderTicketsByName() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getName))
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public void addTicket(TicketDto ticketDto) {
+        Ticket ticket = ticketConverter.convertFromDto(ticketDto);
+        ticketRepository.add(ticket);
+        History history = historyConverter.convertFromDto(HistoryDto.builder()
+                .ticket(ticket)
+                .dateAction(ticket.getDesiredResolutionDate())
+                .action(Action.CREATE)
+                .user(ticket.getOwner())
+                .description(ticket.getDescription())
+                .build());
+        historyRepository.add(history);
     }
 
     @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedInvertedOrderTicketsByName() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getName).reversed())
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedAscendingTicketsByDate() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getDesiredResolutionDate))
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedDescendingTicketsByDate() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getDesiredResolutionDate).reversed())
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedTicketsByUrgency() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getUrgency))
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedInvertedTicketsByUrgency() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getUrgency).reversed())
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedAlphabeticOrderTicketsByStatus() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getState))
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getSortedInvertedTicketsByStatus() {
-        List<Ticket> tickets = ticketRepository.getAll().stream()
-                .sorted(Comparator.comparing(Ticket::getState).reversed())
-                .collect(Collectors.toList());
-        log.info("tickets " + tickets);
-        return tickets;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getTicketById(Long id) {
-        List<Ticket> ticket = ticketRepository.getTicketById(id);
-        log.info("tickets " + ticket);
-        return ticket;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getTicketByName(String name) {
-        List<Ticket> ticket = ticketRepository.getTicketByName(name.toLowerCase());
-        log.info("tickets " + ticket);
-        return ticket;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getTicketByDate(Date date) {
-        List<Ticket> ticket = ticketRepository.getTicketByDate(date);
-        log.info("tickets " + ticket);
-        return ticket;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getTicketByUrgency(Urgency urgency) {
-        List<Ticket> ticket = ticketRepository.getTicketByUrgency(urgency);
-        log.info("tickets " + ticket);
-        return ticket;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            readOnly = true,
-            propagation = Propagation.SUPPORTS)
-    public List<Ticket> getTicketByState(State state) {
-        List<Ticket> ticket = ticketRepository.getTicketByState(state);
-        log.info("tickets " + ticket);
-        return ticket;
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            propagation = Propagation.REQUIRED)
-    public void addTicket(Ticket ticket) {
-        ticketRepository.addTicket(ticket);
-    }
-
-    @Override
-    @Transactional(isolation = Isolation.READ_COMMITTED,
-            propagation = Propagation.REQUIRED
-    )
-    public void editTicket(Long id, Ticket ticket) {
-        Ticket ticketForEdit = ticketRepository.findTicketById(id);
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public void editTicket(Long id, TicketDto ticketDto) {
+        Ticket ticketForEdit = ticketRepository.getId(id);
+        Ticket ticket = ticketConverter.convertFromDto(ticketDto);
         ticketForEdit.setName(ticket.getName());
         ticketForEdit.setDescription(ticket.getDescription());
         ticketForEdit.setCreatedOn(ticket.getCreatedOn());
@@ -239,6 +127,33 @@ public class TicketServiceImpl implements TicketService {
         ticketForEdit.setUrgency(ticket.getUrgency());
         ticketForEdit.setCategory(ticket.getCategory());
         ticketForEdit.setApprover(ticket.getApprover());
-        ticketRepository.editTicket(ticketForEdit);
+        ticketRepository.update(ticketForEdit);
+        History history = historyConverter.convertFromDto(HistoryDto.builder()
+                .ticket(ticketForEdit)
+                .dateAction(ticketForEdit.getDesiredResolutionDate())
+                .action(Action.CREATE)
+                .user(ticketForEdit.getOwner())
+                .description(ticketForEdit.getDescription())
+                .build());
+        historyRepository.add(history);
+    }
+
+    @Override
+    @TicketLogger
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+    public void transitStatus(Long id, Action action) {
+        User user = userRepository.getByEmail("vlad@gmail.com").get();
+        Ticket ticket = ticketRepository.getId(id);
+        Runnable runnable = ticketTransitionMap.getTransientState(ticket, user, action);
+        runnable.run();
+        ticketRepository.update(ticket);
+        History history = historyConverter.convertFromDto(HistoryDto.builder()
+                .ticket(ticket)
+                .dateAction(ticket.getDesiredResolutionDate())
+                .action(action)
+                .user(user)
+                .description(ticket.getDescription())
+                .build());
+        historyRepository.add(history);
     }
 }

@@ -2,11 +2,17 @@ package com.training.vpalagin.project.model;
 
 import com.training.vpalagin.project.model.enums.State;
 import com.training.vpalagin.project.model.enums.Urgency;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
@@ -19,8 +25,15 @@ import javax.validation.constraints.Size;
 import java.util.Date;
 
 @Entity
-@Table(name = "TICKET")
-@Data
+@Table(name = "TICKETS")
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+//@EntityListeners(TicketListener.class) //@PostPersist, @PostUpdate
 public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,13 +52,13 @@ public class Ticket {
     private String createdOn;
 
     @Column(name = "DESIRED_RESOLUTION_DATE")
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @CreationTimestamp
     private Date desiredResolutionDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User assignee;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User owner;
 
     @Enumerated(EnumType.STRING)
@@ -56,9 +69,9 @@ public class Ticket {
     @Column(name = "URGENCY")
     private Urgency urgency;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User approver;
 }

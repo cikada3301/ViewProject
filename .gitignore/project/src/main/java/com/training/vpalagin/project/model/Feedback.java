@@ -1,40 +1,35 @@
 package com.training.vpalagin.project.model;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
 import java.util.Date;
 
 @Entity
-@Table(name = "COMMENTS")
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@NoArgsConstructor
-public class Comment {
-
+@Table(name = "FEEDBACKS")
+@Data
+public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", nullable = false, updatable = false)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
+
+    @Max(value = 5)
+    @Column(name = "DATE")
+    private Integer rate;
+
+    @Column(name = "TIMESTAMP")
+    @CreationTimestamp
+    private Date timestamp;
 
     @Column(name = "TEXT")
     private String text;
 
-    @Column(name = "DATE")
-    @CreationTimestamp
-    private Date date;
-
-    @ManyToOne
+    @OneToOne
     private Ticket ticket;
 }

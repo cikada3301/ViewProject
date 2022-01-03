@@ -1,14 +1,13 @@
-package com.training.vpalagin.project.repository;
+package com.training.vpalagin.project.service;
 
 import com.training.vpalagin.project.model.Attachment;
 
 import java.util.List;
 
-public interface AttachmentRepository {
+public interface AttachmentService {
     List<Attachment> getAll();
 
     void add(Attachment attachment);
 
     void update(Attachment attachment);
-
 }

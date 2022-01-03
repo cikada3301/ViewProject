@@ -4,10 +4,12 @@ import com.training.vpalagin.project.model.Category;
 import com.training.vpalagin.project.model.User;
 import com.training.vpalagin.project.model.enums.State;
 import com.training.vpalagin.project.model.enums.Urgency;
+import lombok.Builder;
 import lombok.Data;
 import java.util.Date;
 
 @Data
+@Builder
 public class TicketDto {
 
     private Long id;

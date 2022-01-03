@@ -2,46 +2,26 @@ package com.training.vpalagin.project.service;
 
 import com.training.vpalagin.project.dto.TicketDto;
 import com.training.vpalagin.project.model.Ticket;
+import com.training.vpalagin.project.model.enums.Action;
 import com.training.vpalagin.project.model.enums.State;
 import com.training.vpalagin.project.model.enums.Urgency;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface TicketService {
     List<TicketDto> getAll();
 
-    List<Ticket> getSortedAscendingTicketsById();
+    List<Ticket> sort(String param);
 
-    List<Ticket> getSortedDescendingTicketsById();
+    Optional<Ticket> find(String param);
 
-    List<Ticket> getSortedAlphabeticOrderTicketsByName();
+    Optional<TicketDto> getById(Long id);
 
-    List<Ticket> getSortedInvertedOrderTicketsByName();
+    void addTicket(TicketDto ticket);
 
-    List<Ticket> getSortedAscendingTicketsByDate();
+    void editTicket(Long id, TicketDto ticket);
 
-    List<Ticket> getSortedDescendingTicketsByDate();
-
-    List<Ticket> getSortedTicketsByUrgency();
-
-    List<Ticket> getSortedInvertedTicketsByUrgency();
-
-    List<Ticket> getSortedAlphabeticOrderTicketsByStatus();
-
-    List<Ticket> getSortedInvertedTicketsByStatus();
-
-    List<Ticket> getTicketById(Long id);
-
-    List<Ticket> getTicketByName(String name);
-
-    List<Ticket> getTicketByDate(Date date);
-
-    List<Ticket> getTicketByUrgency(Urgency urgency);
-
-    List<Ticket> getTicketByState(State state);
-
-    void addTicket(Ticket ticket);
-
-    void editTicket(Long id, Ticket ticket);
+    void transitStatus(Long id, Action action);
 }
