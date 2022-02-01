@@ -9,10 +9,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TICKETS")
@@ -38,16 +39,18 @@ public class Ticket {
 
     @Column(name = "CREATED_ON")
     @CreationTimestamp
-    private Date createdOn;
+    private LocalDateTime createdOn;
 
     @Column(name = "DESIRED_RESOLUTION_DATE")
     @CreationTimestamp
-    private Date desiredResolutionDate;
+    private LocalDateTime desiredResolutionDate;
 
     @ManyToOne
+    @JoinColumn(name = "ASSIGNEE_ID")
     private User assignee;
 
     @ManyToOne
+    @JoinColumn(name = "OWNER_ID")
     private User owner;
 
     @Enumerated(EnumType.STRING)
@@ -58,9 +61,11 @@ public class Ticket {
     @Column(name = "URGENCY")
     private Urgency urgency;
 
-    @ManyToOne
+    @ManyToOne(cascade ={CascadeType.ALL})
+    @JoinColumn(name = "CATEGORY_ID")
     private Category category;
 
     @ManyToOne
+    @JoinColumn(name = "APPROVER_ID")
     private User approver;
 }

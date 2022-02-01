@@ -2,10 +2,10 @@ package com.training.vpalagin.project.service.impl;
 
 import com.training.vpalagin.project.logger.Logger;
 import com.training.vpalagin.project.model.User;
+import com.training.vpalagin.project.model.userDetails.JwtUser;
 import com.training.vpalagin.project.repository.UserRepository;
 import com.training.vpalagin.project.service.UserService;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-@Slf4j
 @AllArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
 
@@ -28,10 +27,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Logger
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true, propagation = Propagation.SUPPORTS)
     public List<User> getAll() {
-        List<User> users = userRepository.getAll();
-        return users;
+        return userRepository.getAll();
     }
-
 
     @Override
     @Logger
@@ -42,6 +39,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         Collection<SimpleGrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.get().getRole().name()));
-        return new org.springframework.security.core.userdetails.User(user.get().getEmail(), user.get().getPassword(), authorities);
+        return new JwtUser(user.get());
     }
 }

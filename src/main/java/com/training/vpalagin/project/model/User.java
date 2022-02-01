@@ -1,5 +1,6 @@
 package com.training.vpalagin.project.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.training.vpalagin.project.model.enums.UserRole;
 import lombok.*;
 
@@ -34,5 +35,6 @@ public class User {
     private String email;
 
     @Column(name = "PASSWORD")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }

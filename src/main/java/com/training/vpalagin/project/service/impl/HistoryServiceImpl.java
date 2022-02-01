@@ -23,7 +23,7 @@ public class HistoryServiceImpl implements HistoryService {
     public List<History> get(Long id) {
         return historyRepository.get(id)
                 .stream()
-                .sorted(Comparator.comparing(History::getDateAction))
+                .sorted(Comparator.comparing(History::getDate))
                 .collect(Collectors.toList());
     }
 

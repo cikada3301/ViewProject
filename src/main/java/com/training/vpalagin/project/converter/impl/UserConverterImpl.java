@@ -1,7 +1,7 @@
 package com.training.vpalagin.project.converter.impl;
 
 import com.training.vpalagin.project.converter.UserConverter;
-import com.training.vpalagin.project.dto.UserViewDto;
+import com.training.vpalagin.project.dto.user.UserViewDto;
 import com.training.vpalagin.project.model.User;
 import org.springframework.stereotype.Component;
 

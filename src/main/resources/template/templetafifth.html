@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<p>
+<p>Ticket was cancelled</p>
+<p>
+    Dear <td th:text="${ticket?.owner?.firstName} + '${ticket?.owner?.lastName}'"></td>,
+</p>
+<p>
+    Ticket <a th:href="@{http://localhost:3000/main-page/${ticket.?id}"></a> was cancelled by the Engineer.
+</p>
+</body>
+</html>

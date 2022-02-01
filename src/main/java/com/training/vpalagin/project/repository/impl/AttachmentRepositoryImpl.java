@@ -6,19 +6,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class AttachmentRepositoryImpl implements AttachmentRepository {
+
+    @PersistenceContext
     private final EntityManager entityManager;
 
     @Override
     public List<Attachment> getAll() {
-        List<Attachment> attachments = entityManager
+        return entityManager
                 .createQuery("from Attachment a ", Attachment.class)
                 .getResultList();
-        return attachments;
+    }
+
+    @Override
+    public Attachment getById(Long id) {
+        return entityManager
+                .createQuery("from Attachment a where a.ticket.id = :id", Attachment.class)
+                .setParameter("id", id)
+                .getSingleResult();
     }
 
     @Override

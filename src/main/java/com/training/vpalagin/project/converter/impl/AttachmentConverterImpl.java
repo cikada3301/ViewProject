@@ -1,29 +1,36 @@
 package com.training.vpalagin.project.converter.impl;
 
 import com.training.vpalagin.project.converter.AttachmentConverter;
-import com.training.vpalagin.project.dto.AttachmentDto;
+import com.training.vpalagin.project.converter.TicketConverter;
+import com.training.vpalagin.project.dto.attachment.AttachmentCreationDto;
+import com.training.vpalagin.project.dto.attachment.AttachmentViewDto;
+import com.training.vpalagin.project.dto.ticket.TicketCreationDto;
 import com.training.vpalagin.project.model.Attachment;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @Component
+@RequiredArgsConstructor
 public class AttachmentConverterImpl implements AttachmentConverter {
+
+    private final TicketConverter ticketConverter;
+
     @Override
-    public Attachment convertFromDto(AttachmentDto attachmentDto) {
+    public Attachment convertFromDto(TicketCreationDto ticketCreationDto) throws IOException {
         return Attachment.builder()
-                .id(attachmentDto.getId())
-                .name(attachmentDto.getName())
-                .file(attachmentDto.getFile())
-                .ticket(attachmentDto.getTicket())
+                .name(ticketCreationDto.getName())
+                .file(ticketCreationDto.getFile().getBytes())
+                .ticket(ticketConverter.convertFromCreationDto(ticketCreationDto))
                 .build();
     }
 
     @Override
-    public AttachmentDto convertToDto(Attachment attachment) {
-        return AttachmentDto.builder()
-                .id(attachment.getId())
+    public AttachmentViewDto convertToViewDto(Attachment attachment) {
+        return AttachmentViewDto.builder()
                 .name(attachment.getName())
                 .file(attachment.getFile())
-                .ticket(attachment.getTicket())
                 .build();
     }
 }

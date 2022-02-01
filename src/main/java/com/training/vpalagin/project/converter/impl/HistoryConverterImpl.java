@@ -3,7 +3,7 @@ package com.training.vpalagin.project.converter.impl;
 import com.training.vpalagin.project.converter.HistoryConverter;
 import com.training.vpalagin.project.converter.TicketConverter;
 import com.training.vpalagin.project.converter.UserConverter;
-import com.training.vpalagin.project.dto.HistoryDto;
+import com.training.vpalagin.project.dto.history.HistoryDto;
 import com.training.vpalagin.project.model.History;
 import com.training.vpalagin.project.model.Ticket;
 import com.training.vpalagin.project.model.User;
@@ -23,7 +23,7 @@ public class HistoryConverterImpl implements HistoryConverter {
         User user = userConverter.convertFromViewDto(historyDto.getUser());
         return History.builder()
                 .ticket(ticket)
-                .dateAction(historyDto.getDateAction())
+                .date(historyDto.getDateAction())
                 .action(historyDto.getAction())
                 .user(user)
                 .description(historyDto.getDescription())

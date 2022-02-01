@@ -28,7 +28,7 @@ public class LoggerAspect {
 
     @Around("springBeanPointcut()")
     public Object logTicket(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("logging service class = " + joinPoint.getSignature().getDeclaringTypeName().toString());
+        log.info("logging service class = " + joinPoint.getSignature().getDeclaringTypeName());
 
         log.debug("Enter: {}.{}() with argument[s] = {}", joinPoint.getSignature().getDeclaringTypeName(),
                 joinPoint.getSignature().getName(), Arrays.toString(joinPoint.getArgs()));

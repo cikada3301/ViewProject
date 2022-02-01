@@ -1,8 +1,8 @@
 package com.training.vpalagin.project.converter;
 
-import com.training.vpalagin.project.dto.TicketCreationDto;
-import com.training.vpalagin.project.dto.TicketUpdateDto;
-import com.training.vpalagin.project.dto.TicketViewDto;
+import com.training.vpalagin.project.dto.ticket.TicketCreationDto;
+import com.training.vpalagin.project.dto.ticket.TicketUpdateDto;
+import com.training.vpalagin.project.dto.ticket.TicketViewDto;
 import com.training.vpalagin.project.model.Ticket;
 
 

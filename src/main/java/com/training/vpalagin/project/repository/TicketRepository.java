@@ -8,7 +8,9 @@ import java.util.Date;
 import java.util.List;
 
 public interface TicketRepository {
-    List<Ticket> getAll();
+    List<Ticket> getAll(Long page);
+
+    List<Ticket> getMyTicket(Long page, String email, String role);
 
     Ticket getById(Long id);
 

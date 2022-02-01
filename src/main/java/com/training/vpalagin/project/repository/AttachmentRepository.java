@@ -7,6 +7,8 @@ import java.util.List;
 public interface AttachmentRepository {
     List<Attachment> getAll();
 
+    Attachment getById(Long id);
+
     void add(Attachment attachment);
 
     void update(Attachment attachment);

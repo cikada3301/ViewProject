@@ -2,10 +2,11 @@ package com.training.vpalagin.project.converter.impl;
 
 import com.training.vpalagin.project.converter.TicketConverter;
 import com.training.vpalagin.project.converter.UserConverter;
-import com.training.vpalagin.project.dto.TicketCreationDto;
-import com.training.vpalagin.project.dto.TicketUpdateDto;
-import com.training.vpalagin.project.dto.TicketViewDto;
-import com.training.vpalagin.project.dto.UserViewDto;
+import com.training.vpalagin.project.dto.ticket.TicketCreationDto;
+import com.training.vpalagin.project.dto.ticket.TicketUpdateDto;
+import com.training.vpalagin.project.dto.ticket.TicketViewDto;
+import com.training.vpalagin.project.dto.user.UserViewDto;
+import com.training.vpalagin.project.model.Category;
 import com.training.vpalagin.project.model.Ticket;
 import com.training.vpalagin.project.model.User;
 import com.training.vpalagin.project.model.enums.UserRole;
@@ -25,12 +26,10 @@ public class TicketConverterImpl implements TicketConverter {
                 .id(ticketCreationDto.getId())
                 .name(ticketCreationDto.getName())
                 .description(ticketCreationDto.getDescription())
-                .createdOn(ticketCreationDto.getCreatedOn())
-                .desiredResolutionDate(ticketCreationDto.getDesiredResolutionDate())
                 .owner(owner)
                 .state(ticketCreationDto.getState())
                 .urgency(ticketCreationDto.getUrgency())
-                .category(ticketCreationDto.getCategory())
+                .category(new Category(null, ticketCreationDto.getCategory()))
                 .approver(new User(1L, "", "", UserRole.EMPLOYEE, "", ""))
                 .assignee(new User(1L, "", "", UserRole.EMPLOYEE, "", ""))
                 .build();
@@ -43,11 +42,10 @@ public class TicketConverterImpl implements TicketConverter {
                 .id(ticketUpdateDto.getId())
                 .name(ticketUpdateDto.getName())
                 .description(ticketUpdateDto.getDescription())
-                .desiredResolutionDate(ticketUpdateDto.getDesiredResolutionDate())
                 .owner(owner)
                 .state(ticketUpdateDto.getState())
                 .urgency(ticketUpdateDto.getUrgency())
-                .category(ticketUpdateDto.getCategory())
+                .category(new Category(null, ticketUpdateDto.getCategory()))
                 .approver(new User(1L, "", "", UserRole.EMPLOYEE, "", ""))
                 .assignee(new User(1L, "", "", UserRole.EMPLOYEE, "", ""))
                 .build();
@@ -78,6 +76,7 @@ public class TicketConverterImpl implements TicketConverter {
         UserViewDto assignee = userConverter.convertToViewDto(ticket.getAssignee());
         UserViewDto owner = userConverter.convertToViewDto(ticket.getOwner());
         UserViewDto approver = userConverter.convertToViewDto(ticket.getApprover());
+
         return TicketViewDto.builder()
                 .id(ticket.getId())
                 .name(ticket.getName())
@@ -100,12 +99,10 @@ public class TicketConverterImpl implements TicketConverter {
                 .id(ticket.getId())
                 .name(ticket.getName())
                 .description(ticket.getDescription())
-                .createdOn(ticket.getCreatedOn())
-                .desiredResolutionDate(ticket.getDesiredResolutionDate())
                 .owner(owner)
                 .state(ticket.getState())
                 .urgency(ticket.getUrgency())
-                .category(ticket.getCategory())
+                .category(ticket.getCategory().getName())
                 .build();
     }
 
@@ -116,11 +113,10 @@ public class TicketConverterImpl implements TicketConverter {
                 .id(ticket.getId())
                 .name(ticket.getName())
                 .description(ticket.getDescription())
-                .desiredResolutionDate(ticket.getDesiredResolutionDate())
                 .owner(owner)
+                .category(ticket.getCategory().getName())
                 .state(ticket.getState())
                 .urgency(ticket.getUrgency())
-                .category(ticket.getCategory())
                 .build();
     }
 }

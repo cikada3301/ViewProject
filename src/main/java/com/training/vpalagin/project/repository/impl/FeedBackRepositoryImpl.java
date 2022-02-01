@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 @Repository
 @RequiredArgsConstructor
 public class FeedBackRepositoryImpl implements FeedBackRepository {
 
+    @PersistenceContext
     private final EntityManager entityManager;
 
     @Override

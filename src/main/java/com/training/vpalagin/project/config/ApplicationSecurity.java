@@ -3,6 +3,7 @@ package com.training.vpalagin.project.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,17 +29,12 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter implements
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService);
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("*");
     }
-
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -46,7 +44,8 @@ public class ApplicationSecurity extends WebSecurityConfigurerAdapter implements
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/login").permitAll()
+                .authorizeRequests().antMatchers("/api/login").permitAll()
+                .antMatchers(Arrays.toString(new HttpMethod[]{HttpMethod.OPTIONS, HttpMethod.PUT}), "**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().exceptionHandling()

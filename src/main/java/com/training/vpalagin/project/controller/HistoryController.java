@@ -10,12 +10,12 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/histories")
 public class HistoryController {
 
     private final HistoryService historyService;
 
-    @GetMapping("/history/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<List<History>> get(@PathVariable Long id) {
         return ResponseEntity.ok(historyService.get(id));
     }
