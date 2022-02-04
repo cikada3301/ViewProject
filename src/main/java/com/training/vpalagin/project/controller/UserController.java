@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/login")
@@ -27,7 +29,7 @@ public class UserController {
     private final UserDetailsService userDetailsService;
 
     @PostMapping
-    public ResponseEntity<?> authentication(@RequestBody UserAuthenticationDto userAuthenticationDto) throws Exception {
+    public ResponseEntity<?> authentication(@Valid @RequestBody UserAuthenticationDto userAuthenticationDto) throws Exception {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(

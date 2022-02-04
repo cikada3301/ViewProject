@@ -4,23 +4,18 @@ import com.training.vpalagin.project.converter.impl.UserConverterImpl;
 import com.training.vpalagin.project.dto.ticket.TicketCreationDto;
 import com.training.vpalagin.project.dto.ticket.TicketUpdateDto;
 import com.training.vpalagin.project.dto.ticket.TicketViewDto;
-import com.training.vpalagin.project.model.Category;
 import com.training.vpalagin.project.model.Ticket;
 import com.training.vpalagin.project.model.enums.Action;
 import com.training.vpalagin.project.model.userDetails.JwtUser;
 import com.training.vpalagin.project.service.TicketService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 

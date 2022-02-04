@@ -198,9 +198,9 @@ public class TicketServiceImpl implements TicketService {
     public void transitStatus(Long id, Action action, JwtUser jwtUser) throws MessagingException {
         User user = userRepository.getByEmail("user1_mogilev@yopmail.com").get();
         Ticket ticket = ticketRepository.getById(id);
+        emailService.sendMessage(ticket, action);
         ticket.setState(ticketTransitionMap.getTransientState(ticket, user, action));
         ticketRepository.update(ticket);
-        emailService.sendMessage(ticket);
         History history = historyConverter.convertFromDto(HistoryDto.builder()
                 .ticket(ticketConverter.convertToViewDto(ticket))
                 .dateAction(ticket.getCreatedOn())

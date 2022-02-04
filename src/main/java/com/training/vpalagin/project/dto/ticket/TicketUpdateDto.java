@@ -1,8 +1,6 @@
 package com.training.vpalagin.project.dto.ticket;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.training.vpalagin.project.dto.user.UserViewDto;
-import com.training.vpalagin.project.model.Category;
 import com.training.vpalagin.project.model.enums.State;
 import com.training.vpalagin.project.model.enums.Urgency;
 import lombok.Builder;
@@ -10,7 +8,6 @@ import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @Data
 @Builder

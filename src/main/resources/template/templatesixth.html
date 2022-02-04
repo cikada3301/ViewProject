@@ -10,7 +10,7 @@
     Dear <td th:text="${ticket?.owner?.firstName} + '${ticket?.owner?.lastName}'"></td>,
 </p>
 <p>
-    Ticket <a th:href="@{http://localhost:3000/main-page/${ticket.?id}"></a> was done by the Engineer.
+    Ticket <a th:href="{ticket.?id}"></a> was done by the Engineer.
 </p>
 <p>
     Please provide your feedback by clicking on the ticket ID.
