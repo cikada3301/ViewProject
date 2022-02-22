@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<p>
+<p>Ticket was done</p>
+<p>
+    Dear <td th:text="${name}"></td>,
+</p>
+<p>
+    Ticket <a th:href="${url} + ${ticketId}" > <td th:text="${ticketId}"></td> </a> was done by the Engineer.
+</p>
+<p>
+    Please provide your feedback by clicking on the ticket ID.
+</p>
+</body>
+</html>
