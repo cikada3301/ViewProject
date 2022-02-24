@@ -45,12 +45,41 @@ public class HistoryConverterImpl implements HistoryConverter {
 
     @Override
     public History convertHistory(Ticket ticket, User user) {
-        History history = History.builder()
+        return History.builder()
                 .ticket(ticket)
                 .action(Action.CREATE)
                 .user(user)
                 .description(ticket.getDescription())
                 .build();
-        return history;
+    }
+
+    @Override
+    public History convertToHistoryWithAttachment(Ticket ticket, User user) {
+        return History.builder()
+                .ticket(ticket)
+                .action(Action.CREATE)
+                .user(user)
+                .description("Add file")
+                .build();
+    }
+
+    @Override
+    public History convertToHistoryWithAttachmentEdit(Ticket ticket, User user) {
+        return History.builder()
+                .ticket(ticket)
+                .action(Action.CREATE)
+                .user(user)
+                .description("Edit file")
+                .build();
+    }
+
+    @Override
+    public History convertToHistoryWithAttachmentDelete(Ticket ticket, User user) {
+        return History.builder()
+                .ticket(ticket)
+                .action(Action.CREATE)
+                .user(user)
+                .description("Delete file")
+                .build();
     }
 }

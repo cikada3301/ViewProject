@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class TicketExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<List<String>> globalExceptionBadRequest(MethodArgumentNotValidException ex) {
+    public ResponseEntity<List<String>> handleExceptionBadRequest(MethodArgumentNotValidException ex) {
         List<String> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.toList());
@@ -24,16 +24,23 @@ public class TicketExceptionHandler {
     }
 
     @ExceptionHandler(TicketExceptionInternalError.class)
-    public ResponseEntity<String> globalExceptionHandler(TicketExceptionInternalError ex) {
+    public ResponseEntity<String> handleExceptionHandler(TicketExceptionInternalError ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ex.getMessage());
     }
 
     @ExceptionHandler(NotAuthorizedException.class)
-    public ResponseEntity<String> notAuthorizedExceptionHandler(NotAuthorizedException ex) {
+    public ResponseEntity<String> handleNotAuthorizedExceptionHandler(NotAuthorizedException ex) {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(TicketTransitStateException.class)
+    public ResponseEntity<String> handleTicketTransitException(TicketTransitStateException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 }

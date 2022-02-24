@@ -19,9 +19,4 @@ public class FeedBackRepositoryImpl implements FeedBackRepository {
     public void add(Feedback feedBack) {
         entityManager.merge(feedBack);
     }
-
-    @Override
-    public void delete(Feedback feedBack) {
-        entityManager.remove(feedBack);
-    }
 }

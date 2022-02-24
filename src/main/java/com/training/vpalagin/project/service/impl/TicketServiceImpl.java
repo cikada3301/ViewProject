@@ -10,6 +10,7 @@ import com.training.vpalagin.project.dto.ticket.TicketCreationDto;
 import com.training.vpalagin.project.dto.ticket.TicketUpdateDto;
 import com.training.vpalagin.project.dto.ticket.TicketViewDto;
 import com.training.vpalagin.project.exception.NotAuthorizedException;
+import com.training.vpalagin.project.exception.TicketTransitStateException;
 import com.training.vpalagin.project.logger.Logger;
 import com.training.vpalagin.project.model.Attachment;
 import com.training.vpalagin.project.model.History;
@@ -154,6 +155,7 @@ public class TicketServiceImpl implements TicketService {
         historyService.add(history);
         if (Objects.nonNull(ticketCreationDto.getFile())) {
             Attachment attachment = attachmentConverter.convertAttachment(ticket, ticketCreationDto.getFile());
+            historyService.add(historyConverter.convertToHistoryWithAttachment(ticket, user));
             attachmentService.add(attachment);
         }
         if (!ticketCreationDto.getComment().isEmpty()) {
@@ -184,6 +186,7 @@ public class TicketServiceImpl implements TicketService {
         if (Objects.nonNull(ticketUpdateDto.getFile())) {
             Attachment attachment = attachmentConverter.convertAttachment(ticket, ticketUpdateDto.getFile());
             attachmentService.add(attachment);
+            historyService.add(historyConverter.convertToHistoryWithAttachmentEdit(ticket, user));
         }
     }
 
@@ -198,6 +201,9 @@ public class TicketServiceImpl implements TicketService {
             ticket.setAssignee(jwtUser.getUser());
         } else if (action == Action.APPROVE) {
             ticket.setApprover(jwtUser.getUser());
+        }
+        if (ticketTransitionMap.getActions(ticketConverter.convertToViewDto(ticket), user).isEmpty()) {
+            throw new TicketTransitStateException("This state is not allowed");
         }
         ticket.setState(ticketTransitionMap.getTransientState(ticket, user, action));
         ticketRepository.update(ticket);

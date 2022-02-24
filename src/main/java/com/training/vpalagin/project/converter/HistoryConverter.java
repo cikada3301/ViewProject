@@ -13,4 +13,10 @@ public interface HistoryConverter {
     History convertHistory(Ticket ticketForEdit, Action create, UserViewDto owner);
 
     History convertHistory(Ticket ticket, User user);
+
+    History convertToHistoryWithAttachment(Ticket ticket, User user);
+
+    History convertToHistoryWithAttachmentEdit(Ticket ticket, User user);
+
+    History convertToHistoryWithAttachmentDelete(Ticket ticket, User user);
 }

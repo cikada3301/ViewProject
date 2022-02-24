@@ -115,6 +115,6 @@ public class TicketTransitionMap {
                 )
         );
         return actionStateMap.get(ticket.getState())
-                .get(user.getRole());
+                .getOrDefault(user.getRole(), new ArrayList<>());
     }
 }
