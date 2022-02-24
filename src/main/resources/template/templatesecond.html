@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket</title>
+</head>
+<body>
+<p>Ticket was approved</p>
+<p>
+ Dear Users,
+</p>
+<p>
+ Ticket <a th:href="${url} + ${ticketId}" ><td th:text="${ticketId}"></td> </a>   was approved by the Manager
+</p>
+</body>
+</html>
